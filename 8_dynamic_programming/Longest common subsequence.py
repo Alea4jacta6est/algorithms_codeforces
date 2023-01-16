@@ -1,31 +1,42 @@
-"""
-3
-1 2 3
-4
-2 3 1 5
-"""
-from sys import stdin
+import sys
+
+n = int(input())
+a = list(map(int, input().split()))
+m = int(input())
+b = list(map(int, input().split()))
+
+dp = [[0] * len(b) for _ in range(len(a))]
+_from = [[None] * len(b) for _ in range(len(a))]
 
 
-def longest_common_subsequence(s1, s2):
-    seq = {}
-    m, n, cnt = len(s1), len(s2), 0
-    d = [[0] * (n + 1) for _ in range(m + 1)]
-    for i in range(m + 1):
-        for j in range(n + 1):
-            if i == 0 or j == 0:
-                d[i][j] = 0
-            elif s1[i - 1] == s2[j - 1]:
-                d[i][j] = d[i - 1][j - 1] + 1
-            else:
-                d[i][j] = max(d[i - 1][j], d[i][j - 1])
-    print(seq)
-    target_seq = [seq[k] for k in seq if len(seq[k]) == d[m][n]][0]
-    return " ".join(target_seq), d[m][n]
+def get_dp(i, j):
+    if i < 0 or j < 0:
+        return 0
+    else:
+        return dp[i][j]
 
 
-# inputs = [item.replace(" ", "").replace("\n", "") for item in stdin.readlines()]
-# seq, length = longest_common_subsequence(inputs[1], inputs[3])
-# print(length)
-# print(seq)
-print(longest_common_subsequence([1, 2, 3], [2, 3, 1, 5]))
+for i in range(len(a)):
+    for j in range(len(b)):
+        if a[i] == b[j]:
+            dp[i][j] = get_dp(i - 1, j - 1) + 1
+        max_dp_i = max(
+            (get_dp(i - 1, j), (i - 1, j)),
+            (get_dp(i, j - 1), (i, j - 1)),
+            (get_dp(i, j), (i - 1, j - 1)),
+            key=lambda x: x[0],
+        )
+        dp[i][j] = max_dp_i[0]
+        _from[i][j] = max_dp_i[1]
+
+longest_common_subs = []
+cur = (len(a) - 1, len(b) - 1)
+while cur[0] != -1 and cur[1] != -1:
+    nxt = _from[cur[0]][cur[1]]
+    if nxt == (cur[0] - 1, cur[1] - 1):
+        longest_common_subs.append(a[cur[0]])
+    cur = nxt
+
+print(len(longest_common_subs))
+for subs in reversed(longest_common_subs):
+    sys.stdout.write(str(subs) + " ")
