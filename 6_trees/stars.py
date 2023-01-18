@@ -3,10 +3,10 @@ class FenwickTree3D:
         self.n = n
         self.graph = [[[0] * n for _ in range(n)] for _ in range(n)]
         self.graph_sum = [[[0] * n for _ in range(n)] for _ in range(n)]
-    
+
     def __getitem__(self, item):
         return self.graph[item[0]][item[1]][item[2]]
-        
+
     def prefix_sum(self, p):
         x, y, z = p
         res = 0
@@ -47,6 +47,7 @@ class FenwickTree3D:
                 y = y | (y + 1)
             x = x | (x + 1)
 
+
 n = int(input())
 t = FenwickTree3D(n)
 events = [0]
@@ -56,4 +57,8 @@ while events[0] != 3:
         x, y, z, k = events[1:]
         t[x, y, z] += k
     elif events[0] == 2:
-        print(t.calculate_stars((events[1], events[2], events[3]), (events[4], events[5], events[6])))
+        print(
+            t.calculate_stars(
+                (events[1], events[2], events[3]), (events[4], events[5], events[6])
+            )
+        )
