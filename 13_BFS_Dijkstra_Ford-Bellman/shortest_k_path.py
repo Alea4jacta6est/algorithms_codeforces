@@ -1,40 +1,23 @@
-from sys import stdin
+import sys
 
 
-def shortestPath(graph, u, v, k):
-    V = 4
-    if k == 0 and u == v:
-        return 0
-    if k == 1 and graph[u][v] != INF:
-        return graph[u][v]
-    if k <= 0:
-        return INF
-
-    # Initialize result
-    res = INF
-
-    # Go to all adjacents of u and recur
-    for i in range(V):
-        if graph[u][i] != INF and u != i and v != i:
-            rec_res = shortestPath(graph, i, v, k - 1)
-            if rec_res != INF:
-                res = min(res, graph[u][i] + rec_res)
+def shortest_paths(n, k, s, edges):
+    dp = tuple([INF for _ in range(k + 1)] for _ in range(n))
+    graph = [[] for _ in range(n)]
+    for a, b, w in edges:
+        graph[a - 1].append((b - 1, w))
+    dp[s - 1][0] = 0
+    for j in range(1, k + 1):
+        for i in range(n):
+            for v, w in graph[i]:
+                for k in range(1, j + 1):
+                    if dp[i][k - 1] != INF:
+                        dp[v][k] = min(dp[v][k], dp[i][k - 1] + w)
+    res = [dp[i][k] if dp[i][k] != INF else -1 for i in range(n)]
     return res
 
 
-INF = 999999999999
 n, m, k, s = map(int, input().split())
-graph = [[INF for _ in range(m)] for _ in range(n)]
-for _ in range(m):
-    e, b, w = [int(_) for _ in stdin.readline().split()]
-    e -= 1
-    b -= 1
-    graph[e][b] = w
-    graph[b][e] = w
-result = shortestPath(graph, s, n - 1, k)
-print(result)
-# for i in range(n):
-#     if result[i] == float("inf"):
-#         print(-1)
-#     else:
-#         print(result[i])
+INF = sys.maxsize
+edges = [tuple(map(int, input().split())) for _ in range(m)]
+print(" ".join(map(str, shortest_paths(n, k, s, edges))))

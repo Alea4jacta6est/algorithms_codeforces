@@ -75,6 +75,7 @@ def delete_vertex(root, key):
         return left_rotation(root)
     return root
 
+
 def left_rotation(z):
     y = z.right
     if y is not None:
@@ -106,10 +107,12 @@ def right_rotation(z):
         y.stree_size = 1 + get_stree_size(y.left) + get_stree_size(y.right)
     return y
 
+
 def get_balance(root):
     if not root:
         return 0
     return get_height(root.left) - get_height(root.right)
+
 
 def get_height(root):
     if not root:
@@ -127,6 +130,7 @@ def get_right_count(root):
     if root.right is None:
         return 0
     return root.right.stree_size
+
 
 tree = None
 n, k = map(int, input().split())

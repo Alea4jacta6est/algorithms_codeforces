@@ -1,52 +1,68 @@
-from sys import stdin, setrecursionlimit
-setrecursionlimit(10**5)
-def dfs(vertex, links, streets):
-    for i in links[vertex]:
+import sys
+
+
+def dfs(v, e, ans):
+    for i in e[v]:
         if not i.d:
             i.d = True
-            to = i.to if vertex == i.from_ else i.from_
-            dfs(to, links, streets)
-    streets.append(vertex)
+            t = i.dir2 if v == i.dir1 else i.dir1
+            dfs(t, e, ans)
+    ans.append(v)
 
 
 class Link:
-    def __init__(self, from_, to, w):
+    def __init__(self, dir1, dir2, w):
+        self.dir1 = dir1
+        self.dir2 = dir2
         self.w = w
-        self.from_ = from_
-        self.to = to
         self.d = False
 
 
-n = int(input())
-graph = [[int(i) for i in item.split()] for item in stdin.readlines()]
-links, streets, arr = {i: [] for i, item in enumerate(graph)}, [], []
-counter = 0
-for i, arr in enumerate(graph):
-    if arr[0] % 2 != 0:
-        counter += 1
-        arr.append(i)
-    for j in range(1, len(arr), 2):
-        e = Link(i, arr[j] - 1, arr[j + 1])
-        if arr[j] - 1 not in links:
-            links[arr[j] - 1] = []
-        if i < arr[j] - 1:
-            links[i].append(e)
-            links[arr[j] - 1].append(e)
+def run():
+    n = int(input())
+    edges = {}
+    counter = 0
+    bad_areas = []
+    for v in range(n):
+        arr = [int(x) for x in input().split()]
+        number_of_streets = arr[0]
+        if number_of_streets % 2 != 0:
+            counter += 1
+            bad_areas.append(v)
+        if v not in edges:
+            edges[v] = []
+        for j in range(1, len(arr), 2):
+            to_ = arr[j] - 1
+            street_len = arr[j + 1]
+            edge = Link(v, to_, street_len)
+            if to_ not in edges:
+                edges[to_] = []
+            if v < to_:
+                edges[v].append(edge)
+                edges[to_].append(edge)
+    if counter % 2 == 1:
+        print(-1)
+        exit(0)
+    ans = []
+    if counter == 2:
+        number_of_streets, to_ = bad_areas[0], bad_areas[1]
+        for v in edges[number_of_streets]:
+            if v.dir1 == number_of_streets and v.dir2 == to_:
+                ans.append(number_of_streets)
+                v.d = True
+                dfs(to_, edges, ans)
+                break
+    else:
+        dfs(0, edges, ans)
+    print(len(ans) - 1)
+    for v in ans:
+        print(v + 1, end=" ")
 
-if counter % 2 == 1:
-    print(-1)
-    exit(0)
-    
-if counter == 2:
-    for i in links[arr[0]]:
-        if i.f == arr[0] and i.t == arr[1]:
-            streets.append(arr[0])
-            i.d = True
-            dfs(arr[1], links, streets)
-            break
-else:
-    dfs(0, links, streets)
 
-print(len(streets) - 1)
-for i in streets:
-    print(i + 1, end=" ")
+import threading
+
+sys.setrecursionlimit(1 << 30)
+threading.stack_size(1 << 27)
+main_thread = threading.Thread(target=run)
+main_thread.start()
+main_thread.join()
